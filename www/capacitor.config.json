@@ -1,0 +1,20 @@
+{
+  "appId": "org.smartfactory.app",
+  "appName": "Smart Factory",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#060E1F",
+      "showSpinner": false
+    }
+  }
+}
