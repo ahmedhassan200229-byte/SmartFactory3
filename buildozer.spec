@@ -5,7 +5,7 @@ package.domain = org.smartfactory
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json,txt
 version = 1.0
-requirements = python3,kivy==2.2.1,requests,urllib3,certifi,charset-normalizer,idna
+requirements = python3,kivy==2.3.0,requests,urllib3,certifi,charset-normalizer,idna
 orientation = portrait
 fullscreen = 0
 presplash.filename =
@@ -20,6 +20,7 @@ android.accept_sdk_license = True
 android.logcat_filters = *:S python:D
 android.add_aars =
 android.gradle_dependencies =
+
 [buildozer]
 log_level = 2
 warn_on_root = 1
