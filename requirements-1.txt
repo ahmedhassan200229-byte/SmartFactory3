@@ -1,4 +1,0 @@
-requirements = python3,kivy==2.2.1,requests,urllib3,certifi,charset-normalizer,idna
-urllib3>=1.26.0
-certifi>=2022.0.0
-pyserial>=3.5
