@@ -38,12 +38,18 @@ jobs:
             openjdk-17-jdk \
             unzip \
             zip \
-            wget
+            wget \
+            ccache
 
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer==1.5.0 Cython==0.29.37
+          pip install buildozer==1.5.0 Cython==3.0.11
+
+      - name: Clean Buildozer Cache
+        run: |
+          rm -rf ~/.buildozer
+          rm -rf .buildozer
 
       - name: Set up Android SDK and NDK
         run: |
