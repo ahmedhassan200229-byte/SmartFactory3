@@ -1,0 +1,114 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            python3-pip \
+            build-essential \
+            git \
+            python3 \
+            python3-dev \
+            libffi-dev \
+            libssl-dev \
+            libgmp-dev \
+            libmpfr-dev \
+            libmpc-dev \
+            zlib1g-dev \
+            libtool \
+            automake \
+            autoconf \
+            pkg-config \
+            cmake \
+            ninja-build \
+            ant \
+            openjdk-17-jdk \
+            unzip \
+            zip \
+            wget \
+            curl \
+            lld
+
+      - name: Install Buildozer and Cython
+        run: |
+          pip install --upgrade pip
+          pip install buildozer==1.5.0
+          pip install Cython==0.29.37
+          pip install virtualenv
+
+      - name: Set up Android SDK and NDK
+        run: |
+          # Download Android command line tools
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd /tmp
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip -q commandlinetools-linux-9477386_latest.zip
+          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+
+          # Set environment variables
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+
+          # Accept licenses
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+
+          # Install SDK packages
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;33.0.2" \
+            "ndk;25.2.9519653" 2>/dev/null
+
+          echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+          echo "NDK_HOME=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+
+      - name: Build APK with Buildozer
+        run: |
+          cd $GITHUB_WORKSPACE
+          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export ANDROID_NDK_HOME=$HOME/android-sdk/ndk/25.2.9519653
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          buildozer -v android debug 2>&1
+        timeout-minutes: 60
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: SmartFactory-APK
+          path: bin/*.apk
+          retention-days: 30
+
+      - name: Upload APK on Failure (debug)
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: build-logs
+          path: |
+            .buildozer/logs/
+            *.log
+          retention-days: 7
