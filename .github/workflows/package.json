@@ -2,11 +2,8 @@
   "name": "smart-factory",
   "version": "1.0.0",
   "description": "Smart Factory Security System",
-  "main": "index.js",
   "scripts": {
-    "build": "echo 'No build step needed'",
-    "cap:sync": "npx cap sync",
-    "cap:open": "npx cap open android"
+    "build": "echo ok"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
